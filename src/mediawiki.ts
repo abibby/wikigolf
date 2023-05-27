@@ -3,7 +3,6 @@ async function apiFetch(
     options: Record<string, string | number>,
 ) {
     const response = await fetch(
-        // 'https://mtg.fandom.com/w/api.php?' +
         'https://en.wikipedia.org/w/api.php?' +
             new URLSearchParams({
                 action,
@@ -22,7 +21,7 @@ async function apiFetch(
 
 export type ParseOptions = {
     page: string
-    prop: 'text' | 'wikitext'
+    prop: string
 }
 
 /**
@@ -33,4 +32,53 @@ export async function parse(options: ParseOptions) {
         ...options,
         formatversion: 2,
     })
+}
+
+export type RandomOptions = {
+    rnlimit: number
+}
+export type RandomResult = {
+    id: number
+    ns: number
+    title: string
+}[]
+
+/**
+ * @link https://www.mediawiki.org/wiki/API:Random
+ */
+export async function random(options: RandomOptions): Promise<RandomResult> {
+    const resp = await apiFetch('query', {
+        ...options,
+        list: 'random',
+        rnnamespace: '0',
+    })
+
+    return resp.query.random
+}
+
+export type LinksOptions = {
+    title: string
+}
+export type LinksResult = {
+    ns: number
+    title: string
+}[]
+
+/**
+ * @link https://www.mediawiki.org/wiki/API:Links
+ */
+export async function links(
+    options: LinksOptions,
+): Promise<LinksResult | undefined> {
+    const result = await apiFetch('query', {
+        titles: options.title,
+        pllimit: 500,
+        plnamespace: 0,
+        prop: 'links',
+    })
+
+    // TODO: loop with more than 500 links
+
+    const pages = result.query.pages
+    return pages[Object.keys(pages)[0]].links
 }

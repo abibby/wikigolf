@@ -3,16 +3,27 @@ import { parse } from '../mediawiki'
 import { useCallback } from 'react'
 import { MouseEventHandler } from 'react'
 import { useNavigate, useParams, useResolvedPath } from 'react-router-dom'
-import { usePages } from '../hooks/pages'
 
 export interface WikiPageProps {
     page: string
+    pages: string[]
 }
 
-export function WikiPage({ page }: WikiPageProps) {
+export function WikiPage({ page, pages }: WikiPageProps) {
     const [html, setHTML] = useState('')
     useEffect(() => {
-        parse({ page: page, prop: 'text' }).then(resp => {
+        let stylesheet: HTMLLinkElement | undefined
+        setHTML('')
+        parse({ page: page, prop: 'text|modules|jsconfigvars' }).then(resp => {
+            const modules = encodeURIComponent(
+                resp.parse.modulestyles.join('|'),
+            )
+            stylesheet = document.createElement('link')
+            stylesheet.rel = 'stylesheet'
+            stylesheet.href = `https://en.wikipedia.org/w/load.php?lang=en&modules=${modules}&only=styles&skin=vector-2022`
+
+            document.head.append(stylesheet)
+
             var el = document.createElement('html')
             el.innerHTML = resp.parse.text
 
@@ -25,14 +36,17 @@ export function WikiPage({ page }: WikiPageProps) {
                     url.origin !== location.origin ||
                     !link.pathname.startsWith('/wiki/')
                 ) {
-                    link.style.backgroundColor = 'red'
+                    link.style.cursor = 'not-allowed'
                 }
             }
             setHTML(el.innerHTML)
         })
+
+        return () => {
+            stylesheet?.remove()
+        }
     }, [page])
     const navigate = useNavigate()
-    const pages = usePages()
     const click = useCallback<MouseEventHandler<HTMLDivElement>>(
         e => {
             e.preventDefault()
@@ -55,6 +69,8 @@ export function WikiPage({ page }: WikiPageProps) {
         [navigate, pages],
     )
 
-    // return <div> {html}</div>
+    if (html === '') {
+        return <div>loading</div>
+    }
     return <div dangerouslySetInnerHTML={{ __html: html }} onClick={click} />
 }

@@ -7,36 +7,21 @@ import {
     useParams,
 } from 'react-router-dom'
 import React from 'react'
-import { usePages } from './hooks/pages'
+import { random } from './mediawiki'
+import { Game } from './pages/game'
+import { Home } from './pages/home'
 
-function App() {
-    const pages = usePages()
-    const name = pages[pages.length - 1]
-    console.log(pages)
-
-    return (
-        <>
-            {/* <h1>Hello World</h1> */}
-            {pages.map((page, i) => (
-                <>
-                    {' -> '}
-                    <Link to={`/wiki/${pages.slice(0, i + 1).join('/')}`}>
-                        {page}
-                    </Link>
-                </>
-            ))}
-            {name && <WikiPage page={name} />}
-        </>
-    )
-}
 const router = createBrowserRouter([
     {
-        path: '/wiki/*',
-        element: <App />,
+        path: '/',
+        element: <Home />,
+    },
+    {
+        path: '/wiki/:goal/*',
+        element: <Game />,
     },
 ])
+
 createRoot(document.getElementById('app')!).render(
-    <React.StrictMode>
-        <RouterProvider router={router} />
-    </React.StrictMode>,
+    <RouterProvider router={router} />,
 )
