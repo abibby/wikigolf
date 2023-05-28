@@ -93,3 +93,77 @@ export async function links(
     const pages = result.query.pages
     return pages[Object.keys(pages)[0]].links
 }
+
+export interface Article {
+    type: string
+    title: string
+    displaytitle: string
+    namespace: { id: number; text: string }
+    wikibase_item: string
+    titles: {
+        canonical: string
+        normalized: string
+        display: string
+    }
+    pageid: 57358746
+    thumbnail: {
+        source: string
+        width: number
+        height: number
+    }
+    originalimage: {
+        source: string
+        width: number
+        height: number
+    }
+    lang: string
+    dir: string
+    revision: string
+    tid: string
+    timestamp: string
+    description: string
+    description_source: string
+    content_urls: {
+        desktop: {
+            page: string
+            revisions: string
+            edit: string
+            talk: string
+        }
+        mobile: {
+            page: string
+            revisions: string
+            edit: string
+            talk: string
+        }
+    }
+    extract: string
+    extract_html: string
+    normalizedtitle: string
+}
+export interface FeaturedResponse {
+    tfa: Article
+    mostread: {
+        date: string
+        articles: Article[]
+    }
+    image: unknown
+    news: unknown
+    onthisday: unknown
+}
+
+export async function featured(date: Date): Promise<FeaturedResponse> {
+    // Get today's featured content from English Wikipedia
+    let year = date.getFullYear()
+    let month = String(date.getMonth() + 1).padStart(2, '0')
+    let day = String(date.getDate()).padStart(2, '0')
+    let url = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${day}`
+
+    let response = await fetch(url, {
+        headers: {
+            // Authorization: 'Bearer YOUR_ACCESS_TOKEN',
+            'Api-User-Agent': 'WikiGolf adam@bibby.io',
+        },
+    })
+    return response.json()
+}
