@@ -7,18 +7,18 @@ import { useNavigate, useParams, useResolvedPath } from 'react-router-dom'
 export interface WikiPageProps {
     page: string
     onRedirect: (newPage: string) => void
+    onNavigate: (newPage: string) => void
 }
 
-export function WikiPage({ page, onRedirect }: WikiPageProps) {
+export function WikiPage({ page, onRedirect, onNavigate }: WikiPageProps) {
     const [html, setHTML] = useState('')
+    const [title, setTitle] = useState('')
     useEffect(() => {
         let stylesheet: HTMLLinkElement | undefined
         setHTML('')
         document.body.scrollTo({ top: 0 })
         parse({ page: page, prop: 'text|modules|jsconfigvars' }).then(resp => {
-            const modules = encodeURIComponent(
-                resp.parse.modulestyles.join('|'),
-            )
+            const modules = encodeURIComponent(resp.modulestyles.join('|'))
             stylesheet = document.createElement('link')
             stylesheet.rel = 'stylesheet'
             stylesheet.href = `https://en.wikipedia.org/w/load.php?lang=en&modules=${modules}&only=styles&skin=vector-2022`
@@ -26,7 +26,7 @@ export function WikiPage({ page, onRedirect }: WikiPageProps) {
             document.head.append(stylesheet)
 
             var el = document.createElement('html')
-            el.innerHTML = resp.parse.text
+            el.innerHTML = resp.text
             const redirect = el.querySelector('.redirectText a')
             if (redirect instanceof HTMLAnchorElement) {
                 const url = new URL(redirect.href)
@@ -45,9 +45,13 @@ export function WikiPage({ page, onRedirect }: WikiPageProps) {
                     link.style.cursor = 'not-allowed'
                     link.href = '#'
                 } else {
-                    link.href = '#' + link.pathname.slice('/wiki/'.length)
+                    const page = link.pathname.slice('/wiki/'.length)
+                    link.href = '#' + page
+                    link.dataset.page = page
                 }
             }
+
+            setTitle(resp.title)
             setHTML(el.innerHTML)
         })
 
@@ -55,31 +59,28 @@ export function WikiPage({ page, onRedirect }: WikiPageProps) {
             stylesheet?.remove()
         }
     }, [page])
-    // const navigate = useNavigate()
-    // const click = useCallback<MouseEventHandler<HTMLDivElement>>(
-    //     e => {
-    //         e.preventDefault()
-    //         e.stopPropagation()
-    //         const el = e.target
-    //         if (el instanceof HTMLAnchorElement) {
-    //             if (!el.href) return
-    //             const url = new URL(el.href)
-    //             if (
-    //                 url.origin !== location.origin ||
-    //                 !url.pathname.startsWith('/wiki/')
-    //             ) {
-    //                 return
-    //             }
-    //             const name = url.pathname.slice('/wiki/'.length)
-    //             console.log(name)
-    //             navigate(`/wiki/${pages.concat([name]).join('/')}`)
-    //         }
-    //     },
-    //     [navigate, pages],
-    // )
+    const click = useCallback<MouseEventHandler<HTMLDivElement>>(
+        e => {
+            e.preventDefault()
+            e.stopPropagation()
+            const el = e.target
+            if (el instanceof HTMLElement) {
+                const page = el.dataset.page
+                if (page !== undefined) {
+                    onNavigate(decodeURIComponent(page))
+                }
+            }
+        },
+        [onNavigate],
+    )
 
     if (html === '') {
         return <div>loading</div>
     }
-    return <div dangerouslySetInnerHTML={{ __html: html }} />
+    return (
+        <div>
+            <h1>{title}</h1>
+            <div dangerouslySetInnerHTML={{ __html: html }} onClick={click} />
+        </div>
+    )
 }

@@ -2,32 +2,12 @@ import { Link, useParams } from 'react-router-dom'
 import { WikiPage } from '../components/wiki-page'
 import styles from './game.module.css'
 import { useCallback, useEffect, useState } from 'react'
-import { useHash } from '../hooks/hash'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Game as DBGame, db } from '../db'
+import { bind } from '@zwzn/spicy'
 
 export function Game() {
     const { goal = '', start = '' } = useParams()
-
-    // const [pages, setPages] = useState<string[]>([])
-    const [current, setCurrent] = useHash(start.replace(/_/g, ' '))
-    const match = goal === current.replace(/_/g, ' ')
-    // useEffect(() => {
-    //     if (current === '') {
-    //         return
-    //     }
-    //     setPages(pages => {
-    //         const newPages = []
-    //         for (const page of pages) {
-    //             newPages.push(page)
-    //             if (page === current) {
-    //                 return newPages
-    //             }
-    //         }
-    //         newPages.push(current)
-    //         return newPages
-    //     })
-    // }, [current])
 
     const game = useLiveQuery(async (): Promise<DBGame> => {
         const game = await db.games
@@ -39,44 +19,19 @@ export function Game() {
                 from: start,
                 to: goal,
                 pages: [start],
+                startedAt: new Date(),
+                finishedAt: null,
             }
         }
         return game
     }, [start, goal])
 
-    useEffect(() => {
-        if (game === undefined) {
-            return
-        }
+    const current = game?.pages[game.pages.length - 1].replace(/_/g, ' ')
+    const match = goal === current
 
-        const pages = game.pages
-        const newPages = []
-        let found = false
-        for (const page of pages) {
-            newPages.push(page)
-            if (page === current) {
-                found = true
-                break
-            }
-        }
-        if (!found) {
-            newPages.push(current)
-        }
-
-        if (arrayEqual(pages, newPages)) {
-            return
-        }
-
-        db.games.put({
-            ...game,
-            pages: newPages,
-        })
-    }, [current, game, start, goal])
     const pages = game?.pages ?? []
     const redirect = useCallback(
         (newPage: string) => {
-            setCurrent(newPage)
-
             if (game === undefined) {
                 return
             }
@@ -88,6 +43,38 @@ export function Game() {
         [game],
     )
 
+    const navigate = useCallback(
+        (newPage: string) => {
+            if (game === undefined) {
+                return
+            }
+
+            const pages = game.pages
+            const newPages = []
+            let found = false
+            for (const page of pages) {
+                newPages.push(page)
+                if (page === newPage) {
+                    found = true
+                    break
+                }
+            }
+            if (!found) {
+                newPages.push(newPage)
+            }
+
+            if (arrayEqual(pages, newPages)) {
+                return
+            }
+
+            db.games.put({
+                ...game,
+                pages: newPages,
+            })
+        },
+        [game, start, goal],
+    )
+
     return (
         <>
             <nav className={styles.nav}>
@@ -97,25 +84,36 @@ export function Game() {
                 <div>
                     <Link to='/'>Home</Link>
                 </div>
-                {pages.map((page, i) => (
-                    <span key={page}>
-                        {i > 0 && ' -> '}
-                        <a href={'#' + page}>{page}</a>
-                    </span>
-                ))}
-                {match && (
-                    <div>
+                <ul className={styles.pages}>
+                    {pages.map(page => (
+                        <li key={page}>
+                            <a href='#' onClick={bind(page, navigate)}>
+                                {page}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+            {match && (
+                <>
+                    <div className={styles.match}>
                         <h3>Match</h3>
                         <p>
                             You got from {start} to {goal} in {pages.length - 1}{' '}
                             clicks
                         </p>
                     </div>
-                )}
-            </nav>
-            {match && <div className={styles.screen}></div>}
+                    <div className={styles.screen}></div>
+                </>
+            )}
             <main className={styles.main}>
-                <WikiPage page={current} onRedirect={redirect} />
+                {current && (
+                    <WikiPage
+                        page={current}
+                        onRedirect={redirect}
+                        onNavigate={navigate}
+                    />
+                )}
             </main>
         </>
     )

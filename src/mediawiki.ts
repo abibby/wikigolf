@@ -24,14 +24,25 @@ export type ParseOptions = {
     prop: string
 }
 
+export interface ParseResponse {
+    jsconfigvars: unknown[]
+    modules: string[]
+    modulescripts: unknown[]
+    modulestyles: string[]
+    pageid: number
+    text: string
+    title: string
+}
+
 /**
  * @link https://www.mediawiki.org/wiki/API:Parsing_wikitext
  */
-export async function parse(options: ParseOptions) {
-    return apiFetch('parse', {
+export async function parse(options: ParseOptions): Promise<ParseResponse> {
+    const body = await apiFetch('parse', {
         ...options,
         formatversion: 2,
     })
+    return body.parse
 }
 
 export type RandomOptions = {
