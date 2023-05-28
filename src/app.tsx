@@ -17,7 +17,7 @@ const router = createBrowserRouter([
         element: <Home />,
     },
     {
-        path: '/wiki/:goal/*',
+        path: '/from/:start/to/:goal',
         element: <Game />,
     },
 ])

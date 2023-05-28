@@ -6,7 +6,7 @@ export function Home() {
     const navigate = useNavigate()
     const play = useCallback(async () => {
         const game = await generate()
-        navigate(`/wiki/${game.end}/${game.start}`)
+        navigate(`/from/${game.start}/to/${game.end}`)
     }, [navigate])
 
     return (
