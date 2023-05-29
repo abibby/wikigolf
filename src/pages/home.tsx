@@ -1,23 +1,33 @@
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { daily, generate } from '../game'
+import { dailyGame, randomGame } from '../game'
+import { bind } from '@zwzn/spicy'
+import { Game, db } from '../db'
 
 export function Home() {
     const navigate = useNavigate()
-    const playRandom = useCallback(async () => {
-        const game = await generate()
-        navigate(`/from/${game.start}/to/${game.end}`)
-    }, [navigate])
-    const playDaily = useCallback(async () => {
-        const game = await daily()
-        navigate(`/from/${game.start}/to/${game.end}`)
-    }, [navigate])
+    const play = useCallback(
+        async (newGame: () => Promise<Game>) => {
+            const game = await newGame()
+
+            const hasGame = await db.games
+                .where(['from', 'to'])
+                .equals([game.from, game.to])
+                .count()
+
+            if (hasGame === 0) {
+                await db.games.add(game)
+            }
+            navigate(`/from/${game.from}/to/${game.to}`)
+        },
+        [navigate],
+    )
 
     return (
         <>
             <h1>WikiGolf</h1>
-            <button onClick={playRandom}>Play</button>
-            <button onClick={playDaily}>Daily</button>
+            <button onClick={bind(randomGame, play)}>Random</button>
+            <button onClick={bind(dailyGame, play)}>Daily</button>
         </>
     )
 }

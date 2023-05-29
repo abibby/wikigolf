@@ -21,13 +21,16 @@ export function Game() {
                 pages: [start],
                 startedAt: new Date(),
                 finishedAt: null,
+                daily: 0,
             }
         }
         return game
     }, [start, goal])
 
     const current = game?.pages[game.pages.length - 1].replace(/_/g, ' ')
-    const match = goal === current
+
+    const match =
+        goal.replace(/_/g, ' ').toLowerCase() === current?.toLowerCase()
 
     const pages = game?.pages ?? []
     const redirect = useCallback(
@@ -82,7 +85,7 @@ export function Game() {
                     {start} -&gt; {goal}
                 </h4>
                 <div>
-                    <Link to='/'>Home</Link>
+                    <Link to='/'>Home</Link> Clicks: {pages.length - 1}
                 </div>
                 <ul className={styles.pages}>
                     {pages.map(page => (

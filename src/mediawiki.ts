@@ -1,8 +1,36 @@
+import { db } from './db'
+import { day, week } from './time'
+
+async function cacheFetch(
+    input: string,
+    init: RequestInit,
+    ttl: number,
+): Promise<any> {
+    if (ttl > 0) {
+        const cache = await db.responseCache.get(input)
+        if (cache !== undefined) {
+            return cache.body
+        }
+    }
+    const resp = await fetch(input, init)
+
+    if (!resp.ok) {
+        throw new Error(resp.statusText)
+    }
+
+    const data = await resp.json()
+    if (ttl > 0) {
+        await db.responseCache.put({ url: input, body: data })
+    }
+    return data
+}
+
 async function apiFetch(
     action: string,
     options: Record<string, string | number>,
+    ttl: number = day,
 ) {
-    const response = await fetch(
+    return cacheFetch(
         'https://en.wikipedia.org/w/api.php?' +
             new URLSearchParams({
                 action,
@@ -10,13 +38,9 @@ async function apiFetch(
                 format: 'json',
                 origin: '*',
             }).toString(),
+        {},
+        ttl,
     )
-
-    if (!response.ok) {
-        throw new Error(response.statusText)
-    }
-
-    return await response.json()
 }
 
 export type ParseOptions = {
@@ -58,11 +82,15 @@ export type RandomResult = {
  * @link https://www.mediawiki.org/wiki/API:Random
  */
 export async function random(options: RandomOptions): Promise<RandomResult> {
-    const resp = await apiFetch('query', {
-        ...options,
-        list: 'random',
-        rnnamespace: '0',
-    })
+    const resp = await apiFetch(
+        'query',
+        {
+            ...options,
+            list: 'random',
+            rnnamespace: '0',
+        },
+        0,
+    )
 
     return resp.query.random
 }
@@ -159,11 +187,13 @@ export async function featured(date: Date): Promise<FeaturedResponse> {
     let day = String(date.getDate()).padStart(2, '0')
     let url = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${day}`
 
-    let response = await fetch(url, {
-        headers: {
-            // Authorization: 'Bearer YOUR_ACCESS_TOKEN',
-            'Api-User-Agent': 'WikiGolf adam@bibby.io',
+    return await cacheFetch(
+        url,
+        {
+            headers: {
+                'Api-User-Agent': 'WikiGolf adam@bibby.io',
+            },
         },
-    })
-    return response.json()
+        week * 4,
+    )
 }
