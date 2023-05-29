@@ -80,9 +80,23 @@ export function Game() {
 
     return (
         <>
-            <nav className={styles.nav}>
+            <nav className={styles.nav + ' mw-parser-output'}>
                 <h4>
-                    {start} -&gt; {goal}
+                    <a
+                        className='external'
+                        target='_blank'
+                        href={`https://en.wikipedia.org/wiki/${start}`}
+                    >
+                        {start}
+                    </a>
+                    {' > '}
+                    <a
+                        className='external'
+                        target='_blank'
+                        href={`https://en.wikipedia.org/wiki/${goal}`}
+                    >
+                        {goal}
+                    </a>
                 </h4>
                 <div>
                     <Link to='/'>Home</Link> Clicks: {pages.length - 1}
@@ -99,11 +113,26 @@ export function Game() {
             </nav>
             {match && (
                 <>
-                    <div className={styles.match}>
+                    <div className={styles.match + ' mw-parser-output'}>
                         <h3>Match</h3>
                         <p>
-                            You got from {start} to {goal} in {pages.length - 1}{' '}
-                            clicks
+                            You got from{' '}
+                            <a
+                                className='external'
+                                target='_blank'
+                                href={`https://en.wikipedia.org/wiki/${start}`}
+                            >
+                                {start}
+                            </a>
+                            {' to '}
+                            <a
+                                className='external'
+                                target='_blank'
+                                href={`https://en.wikipedia.org/wiki/${goal}`}
+                            >
+                                {goal}
+                            </a>{' '}
+                            in {pages.length - 1} clicks
                         </p>
                     </div>
                     <div className={styles.screen}></div>

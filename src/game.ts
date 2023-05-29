@@ -1,10 +1,5 @@
 import { Game } from './db'
-import { Article, featured, links, random } from './mediawiki'
-
-// export interface Game {
-//     start: string
-//     end: string
-// }
+import { featured, random } from './mediawiki'
 
 export async function randomGame(): Promise<Game> {
     const start = (await random({ rnlimit: 1 }))[0].title
@@ -21,14 +16,6 @@ export async function randomGame(): Promise<Game> {
 }
 
 export async function dailyGame(): Promise<Game> {
-    // console.log(
-    //     await links({
-    //         title:
-    //             "Wikipedia:Today's_featured_article/" +
-    //             dateFormatter.format(new Date()).replace(/ /g, '_'),
-    //     }),
-    // )
-
     const start = await featured(new Date())
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
