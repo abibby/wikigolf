@@ -1,5 +1,6 @@
 import { db } from './db'
 import { day, week } from './time'
+import { Split } from './types'
 
 async function cacheFetch(
     input: string,
@@ -22,6 +23,7 @@ async function cacheFetch(
     if (ttl > 0) {
         await db.responseCache.put({ url: input, body: data })
     }
+
     return data
 }
 
@@ -30,7 +32,7 @@ async function apiFetch(
     options: Record<string, string | number>,
     ttl: number = day,
 ) {
-    return cacheFetch(
+    const body = await cacheFetch(
         'https://en.wikipedia.org/w/api.php?' +
             new URLSearchParams({
                 action,
@@ -41,11 +43,22 @@ async function apiFetch(
         {},
         ttl,
     )
+
+    if ('warnings' in body) {
+        console.warn(body.warnings[action].warnings)
+    }
+
+    return body[action]
 }
 
 export type ParseOptions = {
     page: string
-    prop: string
+}
+
+export interface Link {
+    ns: number
+    title: string
+    exists: boolean
 }
 
 export interface ParseResponse {
@@ -56,17 +69,22 @@ export interface ParseResponse {
     pageid: number
     text: string
     title: string
+    links: Link[]
 }
 
 /**
  * @link https://www.mediawiki.org/wiki/API:Parsing_wikitext
  */
-export async function parse(options: ParseOptions): Promise<ParseResponse> {
+export async function parse<T extends string>(
+    options: ParseOptions,
+): Promise<ParseResponse> {
     const body = await apiFetch('parse', {
         ...options,
+        prop: 'text|modules|jsconfigvars|links',
         formatversion: 2,
     })
-    return body.parse
+
+    return body
 }
 
 export type RandomOptions = {
@@ -92,7 +110,7 @@ export async function random(options: RandomOptions): Promise<RandomResult> {
         0,
     )
 
-    return resp.query.random
+    return resp.random
 }
 
 export type LinksOptions = {
@@ -118,7 +136,7 @@ export async function links(
 
     // TODO: loop with more than 500 links
 
-    const pages = result.query.pages
+    const pages = result.pages
     return pages[Object.keys(pages)[0]].links
 }
 

@@ -27,10 +27,9 @@ export function Game() {
         return game
     }, [start, goal])
 
-    const current = game?.pages[game.pages.length - 1].replace(/_/g, ' ')
+    const current = game?.pages[game.pages.length - 1]
 
-    const match =
-        goal.replace(/_/g, ' ').toLowerCase() === current?.toLowerCase()
+    const match = goal === current
 
     const pages = game?.pages ?? []
     const redirect = useCallback(
@@ -74,9 +73,44 @@ export function Game() {
                 ...game,
                 pages: newPages,
             })
+            // location.hash = String(newPages.length)
         },
         [game, start, goal],
     )
+
+    // useEffect(() => {
+    //     async function hashChange(e: HashChangeEvent) {
+    //         if (game === undefined) {
+    //             return
+    //         }
+    //         const hash = Number(new URL(e.newURL).hash.slice(1))
+    //         if (isNaN(hash)) {
+    //             return
+    //         }
+    //         console.log(hash)
+    //         if (game.pages.length === hash) {
+    //             return
+    //         }
+    //         await db.games.put({
+    //             ...game,
+    //             pages: game.pages.slice(0, hash - 1),
+    //         })
+
+    //         // for (let i = 0; i < game.pages.length; i++) {
+    //         //     if (game.pages[i] === hash) {
+    //         //         console.log(i, game.pages, game.pages.slice(0, i + 1))
+
+    //         //         db.games.put({
+    //         //             ...game,
+    //         //             pages: game.pages.slice(0, i + 1),
+    //         //         })
+    //         //     }
+    //         // }
+    //     }
+
+    //     window.addEventListener('hashchange', hashChange)
+    //     return () => window.removeEventListener('hashchange', hashChange)
+    // }, [game])
 
     return (
         <>

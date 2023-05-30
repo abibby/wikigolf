@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { parse } from '../mediawiki'
 import { useCallback } from 'react'
 import { MouseEventHandler } from 'react'
-import { useNavigate, useParams, useResolvedPath } from 'react-router-dom'
+import styles from './wiki-page.module.css'
 
 export interface WikiPageProps {
     page: string
@@ -17,7 +17,9 @@ export function WikiPage({ page, onRedirect, onNavigate }: WikiPageProps) {
         let stylesheet: HTMLLinkElement | undefined
         setHTML('')
         document.body.scrollTo({ top: 0 })
-        parse({ page: page, prop: 'text|modules|jsconfigvars' }).then(resp => {
+        parse({
+            page: page,
+        }).then(resp => {
             const modules = encodeURIComponent(resp.modulestyles.join('|'))
             stylesheet = document.createElement('link')
             stylesheet.rel = 'stylesheet'
@@ -38,17 +40,28 @@ export function WikiPage({ page, onRedirect, onNavigate }: WikiPageProps) {
                 if (!link.href) continue
 
                 const url = new URL(link.href)
+                link.removeAttribute('href')
                 if (
                     url.origin !== location.origin ||
-                    !link.pathname.startsWith('/wiki/')
+                    !url.pathname.startsWith('/wiki/')
                 ) {
                     link.style.cursor = 'not-allowed'
-                    link.href = '#'
-                } else {
-                    const page = link.pathname.slice('/wiki/'.length)
-                    link.href = '#' + page
-                    link.dataset.page = page
+                    if (!link.classList.contains('new')) {
+                        link.classList.add(styles.externalLink)
+                    }
+                    continue
                 }
+                const page = url.pathname.slice('/wiki/'.length)
+                const l = resp.links.find(
+                    l =>
+                        l.title.toLowerCase() ===
+                        page.toLowerCase().replace(/_/g, ' '),
+                )
+                if (l === undefined) {
+                    continue
+                }
+
+                link.dataset.page = l?.title
             }
 
             setTitle(resp.title)
@@ -61,15 +74,15 @@ export function WikiPage({ page, onRedirect, onNavigate }: WikiPageProps) {
     }, [page])
     const click = useCallback<MouseEventHandler<HTMLDivElement>>(
         e => {
-            e.preventDefault()
-            e.stopPropagation()
             const el = e.target
-            if (el instanceof HTMLElement) {
-                const page = el.dataset.page
-                if (page !== undefined) {
-                    onNavigate(decodeURIComponent(page))
-                }
+            if (!(el instanceof HTMLElement)) {
+                return
             }
+            const page = el.dataset.page
+            if (page === undefined) {
+                return
+            }
+            onNavigate(decodeURIComponent(page))
         },
         [onNavigate],
     )
