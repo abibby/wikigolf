@@ -24,7 +24,7 @@ export async function dailyGame(): Promise<Game> {
     return {
         from: start.tfa.normalizedtitle,
         to: end.tfa.normalizedtitle,
-        daily: 0,
+        daily: 1,
         finishedAt: null,
         startedAt: new Date(),
         pages: [start.tfa.normalizedtitle],
