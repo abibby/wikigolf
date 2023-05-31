@@ -6,11 +6,10 @@ import styles from './wiki-page.module.css'
 
 export interface WikiPageProps {
     page: string
-    onRedirect: (newPage: string) => void
     onNavigate: (newPage: string) => void
 }
 
-export function WikiPage({ page, onRedirect, onNavigate }: WikiPageProps) {
+export function WikiPage({ page, onNavigate }: WikiPageProps) {
     const [html, setHTML] = useState('')
     const [title, setTitle] = useState('')
     useEffect(() => {
@@ -29,11 +28,6 @@ export function WikiPage({ page, onRedirect, onNavigate }: WikiPageProps) {
 
             var el = document.createElement('html')
             el.innerHTML = resp.text
-            const redirect = el.querySelector('.redirectText a')
-            if (redirect instanceof HTMLAnchorElement) {
-                const url = new URL(redirect.href)
-                onRedirect(url.pathname.slice('/wiki/'.length))
-            }
 
             const links = el.querySelectorAll('a')
             for (const link of links) {

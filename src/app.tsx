@@ -7,9 +7,9 @@ import {
     useParams,
 } from 'react-router-dom'
 import React from 'react'
-import { random } from './mediawiki'
 import { Game } from './pages/game'
 import { Home } from './pages/home'
+import './app.css'
 
 const router = createBrowserRouter([
     {

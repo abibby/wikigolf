@@ -32,18 +32,6 @@ export function Game() {
     const match = goal === current
 
     const pages = game?.pages ?? []
-    const redirect = useCallback(
-        (newPage: string) => {
-            if (game === undefined) {
-                return
-            }
-            db.games.put({
-                ...game,
-                pages: game.pages.slice(0, -1).concat([newPage]),
-            })
-        },
-        [game],
-    )
 
     const navigate = useCallback(
         (newPage: string) => {
@@ -173,13 +161,7 @@ export function Game() {
                 </>
             )}
             <main className={styles.main}>
-                {current && (
-                    <WikiPage
-                        page={current}
-                        onRedirect={redirect}
-                        onNavigate={navigate}
-                    />
-                )}
+                {current && <WikiPage page={current} onNavigate={navigate} />}
             </main>
         </>
     )

@@ -81,6 +81,7 @@ export async function parse<T extends string>(
     const body = await apiFetch('parse', {
         ...options,
         prop: 'text|modules|jsconfigvars|links',
+        redirects: 'true',
         formatversion: 2,
     })
 
