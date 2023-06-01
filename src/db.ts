@@ -7,6 +7,7 @@ export interface Game {
     startedAt: Date
     finishedAt: Date | null
     daily: number
+    leastClicks?: number
 }
 
 export interface ResponseCache {
@@ -20,6 +21,10 @@ export class WikiGolfDatabase extends Dexie {
 
     constructor() {
         super('wikigolf')
+        this.version(3).stores({
+            games: '[from+to],daily,startedAt',
+            responseCache: 'url',
+        })
         this.version(2).stores({
             games: '[from+to],daily',
             responseCache: 'url',

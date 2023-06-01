@@ -31,11 +31,11 @@ export async function dailyGame(): Promise<Game> {
     }
 }
 
-export async function parGame(par: number): Promise<Game> {
+export async function parGame(leastClicks: number): Promise<Game> {
     const start = (await random({ rnlimit: 1 }))[0].title
     let current = start
 
-    for (let i = 0; i < par; i++) {
+    for (let i = 0; i < leastClicks; i++) {
         const page = await parse({ page: current })
         const next = randomElement(page.links.filter(l => l.ns === 0))
         current = next.title
@@ -49,6 +49,7 @@ export async function parGame(par: number): Promise<Game> {
         finishedAt: null,
         startedAt: new Date(),
         pages: [start],
+        leastClicks: leastClicks,
     }
 }
 
