@@ -7,6 +7,7 @@
     padding: 10px;
     border-bottom: solid 1px grey;
     z-index: 2;
+    box-sizing: border-box;
 }
 
 .main {

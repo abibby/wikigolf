@@ -25,7 +25,6 @@ export function WikiPage({ page, onNavigate }: WikiPageProps) {
             stylesheet.href = `https://en.wikipedia.org/w/load.php?lang=en&modules=${modules}&only=styles&skin=vector-2022`
 
             document.head.append(stylesheet)
-            console.log(resp.links)
 
             var el = document.createElement('html')
             el.innerHTML = resp.text
@@ -54,9 +53,7 @@ export function WikiPage({ page, onNavigate }: WikiPageProps) {
                         l.title.toLowerCase() ===
                         page.toLowerCase().replace(/_/g, ' '),
                 )
-                if (page.startsWith('Ignace')) {
-                    console.log(page)
-                }
+
                 if (l === undefined) {
                     continue
                 }

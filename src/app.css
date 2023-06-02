@@ -12,7 +12,7 @@ body {
     .infobox {
         width: 100% !important;
     }
-
+    .noresize,
     .thumb {
         width: 100% !important;
         overflow-x: auto;
