@@ -15,3 +15,20 @@
     background-color: #fff;
     padding: 10px;
 }
+
+.count {
+    position: relative;
+    width: 100px;
+}
+
+.count::before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(var(--games) / var(--total-games) * 100%);
+    background-color: #eee;
+    z-index: -1;
+}

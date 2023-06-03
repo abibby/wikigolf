@@ -66,6 +66,16 @@ export function Game() {
         [game, start, goal],
     )
 
+    useEffect(() => {
+        if (game === undefined) return
+        if (match && game.finishedAt === null) {
+            db.games.put({
+                ...game,
+                finishedAt: new Date(),
+            })
+        }
+    }, [match, game])
+
     // useEffect(() => {
     //     async function hashChange(e: HashChangeEvent) {
     //         if (game === undefined) {

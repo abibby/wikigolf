@@ -1,10 +1,14 @@
-html,
-body {
-    overflow-x: hidden;
-}
-
 .navbox {
     width: 100%;
+    overflow-x: auto;
+}
+
+.infobox {
+    max-width: 100% !important;
+}
+.noresize,
+.thumb {
+    max-width: 100% !important;
     overflow-x: auto;
 }
 
@@ -15,7 +19,6 @@ body {
     .noresize,
     .thumb {
         width: 100% !important;
-        overflow-x: auto;
     }
 
     table {
