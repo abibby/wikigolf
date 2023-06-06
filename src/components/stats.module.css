@@ -1,0 +1,25 @@
+.root {
+    width: 100%;
+    max-width: 400px;
+}
+.clicks {
+    width: 1.5rem;
+    text-align: left;
+}
+
+.count {
+    position: relative;
+    padding-left: 0.25rem;
+}
+
+.count::before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(var(--games) / var(--max-games) * 100%);
+    background-color: #eee;
+    z-index: -1;
+}

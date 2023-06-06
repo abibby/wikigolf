@@ -113,6 +113,9 @@ export function Game() {
     return (
         <>
             <nav className={styles.nav + ' mw-parser-output'}>
+                <div>
+                    <Link to='/'>Home</Link> Clicks: {pages.length - 1}
+                </div>
                 <h4>
                     <a
                         className='external'
@@ -130,9 +133,6 @@ export function Game() {
                         {goal}
                     </a>
                 </h4>
-                <div>
-                    <Link to='/'>Home</Link> Clicks: {pages.length - 1}
-                </div>
                 <ul className={styles.pages}>
                     {pages.map(page => (
                         <li key={page}>

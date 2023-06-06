@@ -1,9 +1,9 @@
 .nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
+    position: sticky;
+    top: 0px;
+    width: calc(100vw - 20px);
     background-color: white;
+    margin: -10px;
     padding: 10px;
     border-bottom: solid 1px grey;
     z-index: 2;
@@ -12,11 +12,9 @@
 
 .nav > h4 {
     white-space: nowrap;
-}
-
-.main {
-    padding: 10px;
-    margin-top: 100px;
+    overflow-x: auto;
+    padding: 10px 0;
+    margin: 0;
 }
 
 .pages {
