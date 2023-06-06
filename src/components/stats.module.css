@@ -10,6 +10,7 @@
 .count {
     position: relative;
     padding-left: 0.25rem;
+    width: 100%;
 }
 
 .count::before {
