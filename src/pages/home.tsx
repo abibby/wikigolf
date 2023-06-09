@@ -5,9 +5,9 @@ import { bind } from '@zwzn/spicy'
 import { Game, db } from '../db'
 import styles from './home.module.css'
 import { useLiveQuery } from 'dexie-react-hooks'
-import differenceInCalendarDays from 'date-fns/esm/differenceInCalendarDays'
 import { Stats } from '../components/stats'
 import { useGameStats } from '../hooks/daily-stats'
+import { GameInfo } from '../components/game-info'
 
 export function Home() {
     const [loading, setLoading] = useState(false)
@@ -66,15 +66,7 @@ export function Home() {
             <h1>WikiGolf</h1>
             <p>
                 <button onClick={bind(dailyGame, play)}>Daily</button>
-                {daily && (
-                    <div>
-                        {daily.from}
-                        {' > '}
-                        {daily.to}
-                        {' | '}
-                        {daily.pages.length - 1}
-                    </div>
-                )}
+                {daily && <GameInfo game={daily} />}
             </p>
             <p>
                 <button onClick={bind(randomGame, play)}>Random</button>
@@ -90,7 +82,8 @@ export function Home() {
                 {latestGames?.map(g => (
                     <li key={g.from + g.to}>
                         <Link to={`/from/${g.from}/to/${g.to}`}>
-                            {g.from} &gt; {g.to} | {g.pages.length - 1}
+                            <GameInfo game={g} />
+                            {/* {g.from} &gt; {g.to} | {g.pages.length - 1} */}
                         </Link>
                     </li>
                 ))}

@@ -34,7 +34,6 @@ export function useGameStats(
             }
             if (game.finishedAt !== null) {
                 const wins = increment(dailyStats.wins, game.pages.length - 1)
-                console.log(wins)
 
                 dailyStats.maxWins = Math.max(dailyStats.maxWins, wins)
                 finishedGames++
