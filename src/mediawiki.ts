@@ -1,11 +1,11 @@
 import { db } from './db'
 import { day, week } from './time'
-import { Split } from './types'
 
 async function cacheFetch(
     input: string,
     init: RequestInit,
     ttl: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> {
     if (ttl > 0) {
         const cache = await db.responseCache.get(input)
@@ -75,9 +75,7 @@ export interface ParseResponse {
 /**
  * @link https://www.mediawiki.org/wiki/API:Parsing_wikitext
  */
-export async function parse<T extends string>(
-    options: ParseOptions,
-): Promise<ParseResponse> {
+export async function parse(options: ParseOptions): Promise<ParseResponse> {
     const body = await apiFetch('parse', {
         ...options,
         prop: 'text|modules|jsconfigvars|links',
@@ -201,10 +199,10 @@ export interface FeaturedResponse {
 
 export async function featured(date: Date): Promise<FeaturedResponse> {
     // Get today's featured content from English Wikipedia
-    let year = date.getFullYear()
-    let month = String(date.getMonth() + 1).padStart(2, '0')
-    let day = String(date.getDate()).padStart(2, '0')
-    let url = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${day}`
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const url = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${day}`
 
     return await cacheFetch(
         url,

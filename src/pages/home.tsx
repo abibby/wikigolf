@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { dailyGame, randomGame, parGame } from '../game'
+import { dailyGame, randomGame, parGame, link } from '../game'
 import { bind } from '@zwzn/spicy'
 import { Game, db } from '../db'
 import styles from './home.module.css'
@@ -39,7 +39,7 @@ export function Home() {
                 await db.games.add(game)
             }
             setLoading(false)
-            navigate(`/from/${game.from}/to/${game.to}`)
+            navigate(link(game))
         },
         [navigate],
     )
@@ -65,8 +65,11 @@ export function Home() {
         <>
             <h1>WikiGolf</h1>
             <p>
-                <button onClick={bind(dailyGame, play)}>Daily</button>
-                {daily && <GameInfo game={daily} />}
+                {daily && (
+                    <Link to={link(daily)}>
+                        <GameInfo game={daily} />
+                    </Link>
+                )}
             </p>
             <p>
                 <button onClick={bind(randomGame, play)}>Random</button>

@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Game, db } from '../db'
+import { Game } from '../db'
 import differenceInCalendarDays from 'date-fns/esm/differenceInCalendarDays'
 import { useCallback } from 'react'
 
@@ -15,6 +15,7 @@ export function useGameStats(
     querier: () => Promise<Game[]>,
     deps: React.DependencyList,
 ): DailyStats | undefined {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const cb = useCallback(querier, deps)
     return useLiveQuery(async (): Promise<DailyStats | undefined> => {
         const games = await cb()

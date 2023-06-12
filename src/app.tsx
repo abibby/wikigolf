@@ -1,11 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import { WikiPage } from './components/wiki-page'
-import {
-    createBrowserRouter,
-    Link,
-    RouterProvider,
-    useParams,
-} from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import React from 'react'
 import { Game } from './pages/game'
 import { Home } from './pages/home'
@@ -22,6 +16,7 @@ const router = createBrowserRouter([
     },
 ])
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 createRoot(document.getElementById('app')!).render(
     <RouterProvider router={router} />,
 )

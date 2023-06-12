@@ -1,4 +1,5 @@
 import { Game } from '../db'
+import React from 'react'
 
 export interface GameInfoProps {
     game: Game

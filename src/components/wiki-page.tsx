@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { parse } from '../mediawiki'
-import { useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { MouseEventHandler } from 'react'
 import styles from './wiki-page.module.css'
 
@@ -26,7 +26,7 @@ export function WikiPage({ page, onNavigate }: WikiPageProps) {
 
             document.head.append(stylesheet)
 
-            var el = document.createElement('html')
+            const el = document.createElement('html')
             el.innerHTML = resp.text
 
             const links = el.querySelectorAll('a')

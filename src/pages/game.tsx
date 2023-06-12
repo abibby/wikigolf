@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { WikiPage } from '../components/wiki-page'
 import styles from './game.module.css'
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Game as DBGame, db } from '../db'
 
@@ -63,7 +63,7 @@ export function Game() {
 
             location.hash = String(newIndex)
         },
-        [game, start, goal],
+        [game],
     )
 
     useEffect(() => {
@@ -98,12 +98,13 @@ export function Game() {
         <>
             <nav className={styles.nav + ' mw-parser-output'}>
                 <div>
-                    <Link to='/'>Home</Link> Clicks: {pages.length - 1}
+                    <Link to='/'>WikiGolf</Link> Clicks: {game?.index ?? 0}
                 </div>
                 <h4>
                     <a
                         className='external'
                         target='_blank'
+                        rel='noreferrer'
                         href={`https://en.wikipedia.org/wiki/${start}`}
                     >
                         {start}
@@ -112,6 +113,7 @@ export function Game() {
                     <a
                         className='external'
                         target='_blank'
+                        rel='noreferrer'
                         href={`https://en.wikipedia.org/wiki/${goal}`}
                     >
                         {goal}
@@ -143,6 +145,7 @@ export function Game() {
                             <a
                                 className='external'
                                 target='_blank'
+                                rel='noreferrer'
                                 href={`https://en.wikipedia.org/wiki/${start}`}
                             >
                                 {start}
@@ -151,6 +154,7 @@ export function Game() {
                             <a
                                 className='external'
                                 target='_blank'
+                                rel='noreferrer'
                                 href={`https://en.wikipedia.org/wiki/${goal}`}
                             >
                                 {goal}

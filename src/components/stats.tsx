@@ -1,5 +1,6 @@
 import { DailyStats } from '../hooks/daily-stats'
 import styles from './stats.module.css'
+import React from 'react'
 
 export interface StatsProps {
     stats: DailyStats

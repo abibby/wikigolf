@@ -55,12 +55,16 @@ export async function parGame(leastClicks: number): Promise<Game> {
     }
 }
 
+export function link(g: Game): string {
+    return `/from/${g.from}/to/${g.to}`
+}
+
 function randomElement<T>(list: T[]): T {
     return list[Math.floor(Math.random() * list.length)]
 }
 
 function sleep(timeout: number): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
         setTimeout(() => {
             resolve()
         }, timeout)
