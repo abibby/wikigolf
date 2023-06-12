@@ -77,8 +77,12 @@ export function Game() {
 
     useEffect(() => {
         if (game === undefined) return
-        if (match && game.finishedAt === null) {
+        const isFinished = game.finishedAt !== null
+        if (match === isFinished) return
+        if (match) {
             db.games.update(game, { finishedAt: new Date() })
+        } else {
+            db.games.update(game, { finishedAt: null })
         }
     }, [match, game])
 
