@@ -30,6 +30,10 @@
     display: inline;
     content: ' / ';
 }
+.reverted {
+    color: grey !important;
+}
+
 .match {
     position: fixed;
     top: 50%;

@@ -21,47 +21,46 @@ export function Game() {
                 pages: [start],
                 startedAt: new Date(),
                 finishedAt: null,
+                index: 0,
                 daily: 0,
             }
+        }
+        if (game.index === undefined) {
+            game.index = game.pages.length - 1
         }
         return game
     }, [start, goal])
 
-    const current = game?.pages[game.pages.length - 1]
+    const current = game?.pages[game.index]
 
     const match = goal === current
 
     const pages = game?.pages ?? []
 
     const navigate = useCallback(
-        (newPage: string) => {
+        async (newPage: string) => {
             if (game === undefined) {
                 return
             }
 
             const pages = game.pages
-            const newPages = []
-            let found = false
+            let i = 0
             for (const page of pages) {
-                newPages.push(page)
                 if (page === newPage) {
-                    found = true
-                    break
+                    location.hash = String(i)
+                    return
                 }
-            }
-            if (!found) {
-                newPages.push(newPage)
+                i++
             }
 
-            if (arrayEqual(pages, newPages)) {
-                return
+            const newPages = pages.slice(0, game.index + 1).concat([newPage])
+            const newIndex = newPages.length - 1
+
+            if (!arrayEqual(pages, newPages)) {
+                db.games.update(game, { pages: newPages })
             }
 
-            db.games.put({
-                ...game,
-                pages: newPages,
-            })
-            // location.hash = String(newPages.length)
+            location.hash = String(newIndex)
         },
         [game, start, goal],
     )
@@ -69,46 +68,30 @@ export function Game() {
     useEffect(() => {
         if (game === undefined) return
         if (match && game.finishedAt === null) {
-            db.games.put({
-                ...game,
-                finishedAt: new Date(),
-            })
+            db.games.update(game, { finishedAt: new Date() })
         }
     }, [match, game])
 
-    // useEffect(() => {
-    //     async function hashChange(e: HashChangeEvent) {
-    //         if (game === undefined) {
-    //             return
-    //         }
-    //         const hash = Number(new URL(e.newURL).hash.slice(1))
-    //         if (isNaN(hash)) {
-    //             return
-    //         }
-    //         console.log(hash)
-    //         if (game.pages.length === hash) {
-    //             return
-    //         }
-    //         await db.games.put({
-    //             ...game,
-    //             pages: game.pages.slice(0, hash - 1),
-    //         })
+    useEffect(() => {
+        async function hashChange() {
+            if (game === undefined) {
+                return
+            }
+            const hashStr = location.hash.slice(1)
+            const hash = Number(hashStr)
+            if (hashStr === '' || isNaN(hash)) {
+                const newURL = new URL(location.href)
+                newURL.hash = String(game.index)
+                history.replaceState({}, '', newURL)
+                return
+            }
+            await db.games.update(game, { index: hash })
+        }
 
-    //         // for (let i = 0; i < game.pages.length; i++) {
-    //         //     if (game.pages[i] === hash) {
-    //         //         console.log(i, game.pages, game.pages.slice(0, i + 1))
-
-    //         //         db.games.put({
-    //         //             ...game,
-    //         //             pages: game.pages.slice(0, i + 1),
-    //         //         })
-    //         //     }
-    //         // }
-    //     }
-
-    //     window.addEventListener('hashchange', hashChange)
-    //     return () => window.removeEventListener('hashchange', hashChange)
-    // }, [game])
+        hashChange()
+        window.addEventListener('hashchange', hashChange)
+        return () => window.removeEventListener('hashchange', hashChange)
+    }, [game])
 
     return (
         <>
@@ -134,9 +117,16 @@ export function Game() {
                     </a>
                 </h4>
                 <ul className={styles.pages}>
-                    {pages.map(page => (
+                    {pages.map((page, i) => (
                         <li key={page}>
-                            <a href='#' onClick={bind(page, navigate)}>
+                            <a
+                                href={`#${i}`}
+                                className={
+                                    i > (game?.index ?? Number.MAX_SAFE_INTEGER)
+                                        ? styles.reverted
+                                        : ''
+                                }
+                            >
                                 {page}
                             </a>
                         </li>

@@ -7,6 +7,7 @@ export interface Game {
     startedAt: Date
     finishedAt: Date | null
     daily: number
+    index: number
     leastClicks?: number
 }
 
