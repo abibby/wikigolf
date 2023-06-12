@@ -1,19 +1,22 @@
 import { Link, useParams } from 'react-router-dom'
 import { WikiPage } from '../components/wiki-page'
 import styles from './game.module.css'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Game as DBGame, db } from '../db'
 
 export function Game() {
     const { goal = '', start = '' } = useParams()
+    const firstQuery = useRef(false)
 
     const game = useLiveQuery(async (): Promise<Required<DBGame>> => {
+        const first = firstQuery.current
+        firstQuery.current = true
+
         let game = await db.games
             .where(['from', 'to'])
             .equals([start, goal])
             .first()
-        console.log(start, goal, game)
 
         if (game === undefined) {
             game = {
@@ -26,7 +29,10 @@ export function Game() {
                 daily: 0,
                 leastClicks: null,
             }
-            await db.games.add(game)
+
+            if (first) {
+                await db.games.add(game)
+            }
         }
 
         return {
