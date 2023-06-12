@@ -12,7 +12,7 @@ module.exports = {
     ignorePatterns: ['dist/*'],
     rules: {
         'react-hooks/exhaustive-deps': ['warn', {
-            additionalHooks: '(useGameStats)'
+            additionalHooks: '(useGameStats|useLiveQuery)'
         }]
     }
 };

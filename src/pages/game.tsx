@@ -9,12 +9,14 @@ export function Game() {
     const { goal = '', start = '' } = useParams()
 
     const game = useLiveQuery(async (): Promise<Required<DBGame>> => {
-        const game = await db.games
+        let game = await db.games
             .where(['from', 'to'])
             .equals([start, goal])
             .first()
+        console.log(start, goal, game)
+
         if (game === undefined) {
-            return {
+            game = {
                 from: start,
                 to: goal,
                 pages: [start],
@@ -24,6 +26,7 @@ export function Game() {
                 daily: 0,
                 leastClicks: null,
             }
+            await db.games.add(game)
         }
 
         return {
@@ -58,7 +61,7 @@ export function Game() {
             const newIndex = newPages.length - 1
 
             if (!arrayEqual(pages, newPages)) {
-                db.games.update(game, { pages: newPages })
+                await db.games.update(game, { pages: newPages })
             }
 
             location.hash = String(newIndex)
@@ -80,12 +83,14 @@ export function Game() {
             }
             const hashStr = location.hash.slice(1)
             const hash = Number(hashStr)
+
             if (hashStr === '' || isNaN(hash)) {
                 const newURL = new URL(location.href)
                 newURL.hash = String(game.index)
                 history.replaceState({}, '', newURL)
                 return
             }
+
             await db.games.update(game, { index: hash })
         }
 

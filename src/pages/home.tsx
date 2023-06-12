@@ -64,6 +64,7 @@ export function Home() {
     return (
         <>
             <h1>WikiGolf</h1>
+            <h2>Daily Game</h2>
             <p>
                 {daily && (
                     <Link to={link(daily)}>
@@ -71,6 +72,7 @@ export function Home() {
                     </Link>
                 )}
             </p>
+            <h2>New Game</h2>
             <p>
                 <button onClick={bind(randomGame, play)}>Random</button>
             </p>
