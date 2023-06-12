@@ -12,6 +12,7 @@ export async function randomGame(): Promise<Game> {
         finishedAt: null,
         startedAt: new Date(),
         pages: [start],
+        leastClicks: null,
     }
 }
 
@@ -28,6 +29,7 @@ export async function dailyGame(): Promise<Game> {
         finishedAt: null,
         startedAt: new Date(),
         pages: [start.tfa.normalizedtitle],
+        leastClicks: null,
     }
 }
 

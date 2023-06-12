@@ -7,8 +7,8 @@ export interface Game {
     startedAt: Date
     finishedAt: Date | null
     daily: number
-    index: number
-    leastClicks?: number
+    index?: number
+    leastClicks: number | null
 }
 
 export interface ResponseCache {

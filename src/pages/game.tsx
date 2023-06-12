@@ -4,12 +4,11 @@ import styles from './game.module.css'
 import { useCallback, useEffect, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Game as DBGame, db } from '../db'
-import { bind } from '@zwzn/spicy'
 
 export function Game() {
     const { goal = '', start = '' } = useParams()
 
-    const game = useLiveQuery(async (): Promise<DBGame> => {
+    const game = useLiveQuery(async (): Promise<Required<DBGame>> => {
         const game = await db.games
             .where(['from', 'to'])
             .equals([start, goal])
@@ -23,12 +22,14 @@ export function Game() {
                 finishedAt: null,
                 index: 0,
                 daily: 0,
+                leastClicks: null,
             }
         }
-        if (game.index === undefined) {
-            game.index = game.pages.length - 1
+
+        return {
+            index: game.pages.length - 1,
+            ...game,
         }
-        return game
     }, [start, goal])
 
     const current = game?.pages[game.index]
