@@ -15,7 +15,7 @@ export function GameInfo({ game }: GameInfoProps) {
                 <strong>To:</strong> {game.to}
             </div>
             <div>
-                <strong>Clicks:</strong> {game.index}
+                <strong>Clicks:</strong> {game.index ?? 0}
             </div>
             {game.finishedAt && (
                 <div>
