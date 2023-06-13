@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {
+    MouseEventHandler,
+    useCallback,
+    useEffect,
+    useState,
+} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { dailyGame, randomGame, parGame, link } from '../game'
 import { bind } from '@zwzn/spicy'
@@ -50,7 +55,15 @@ export function Home() {
     const parGameWithPar = useCallback(() => {
         return parGame(par)
     }, [par])
-    const getDailyGame = useCallback(async () => daily ?? dailyGame(), [daily])
+    const playDaily = useCallback<MouseEventHandler<HTMLAnchorElement>>(
+        async e => {
+            e.preventDefault()
+            if (daily === undefined) return
+
+            await play(async () => daily)
+        },
+        [daily, play],
+    )
 
     const latestGames = useLiveQuery(
         () => db.games.orderBy('startedAt').reverse().limit(5).toArray(),
@@ -68,7 +81,7 @@ export function Home() {
             <h2>Daily Game</h2>
             <div>
                 {daily && (
-                    <a onClick={bind(getDailyGame, play)}>
+                    <a onClick={playDaily} href={link(daily)}>
                         <GameInfo game={daily} />
                     </a>
                 )}
@@ -89,7 +102,6 @@ export function Home() {
                     <li key={g.from + g.to}>
                         <Link to={`/from/${g.from}/to/${g.to}`}>
                             <GameInfo game={g} />
-                            {/* {g.from} &gt; {g.to} | {g.pages.length - 1} */}
                         </Link>
                     </li>
                 ))}

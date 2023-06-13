@@ -22,6 +22,20 @@ export class WikiGolfDatabase extends Dexie {
 
     constructor() {
         super('wikigolf')
+        this.version(6).upgrade(async tx => {
+            const games = await tx
+                .table('games')
+                .where(['from', 'to'])
+                .anyOf([
+                    ['Diodorus scytobrachion', 'BTS'],
+                    ['BTS', 'Short-beaked echidna'],
+                    ['Short-beaked echidna', 'USS Massachusetts (BB-2)'],
+                ])
+                .toArray()
+            for (const game of games) {
+                await tx.table('games').update(game, { daily: 1 })
+            }
+        })
         this.version(3).stores({
             games: '[from+to],daily,startedAt',
             responseCache: 'url',
