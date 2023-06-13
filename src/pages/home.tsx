@@ -50,6 +50,7 @@ export function Home() {
     const parGameWithPar = useCallback(() => {
         return parGame(par)
     }, [par])
+    const getDailyGame = useCallback(async () => daily ?? dailyGame(), [daily])
 
     const latestGames = useLiveQuery(
         () => db.games.orderBy('startedAt').reverse().limit(5).toArray(),
@@ -67,9 +68,9 @@ export function Home() {
             <h2>Daily Game</h2>
             <div>
                 {daily && (
-                    <Link to={link(daily)}>
+                    <a onClick={bind(getDailyGame, play)}>
                         <GameInfo game={daily} />
-                    </Link>
+                    </a>
                 )}
             </div>
             <h2>New Game</h2>
