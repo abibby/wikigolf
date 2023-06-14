@@ -71,8 +71,8 @@ export function WikiPage({ page, onNavigate }: WikiPageProps) {
     }, [page])
     const click = useCallback<MouseEventHandler<HTMLDivElement>>(
         e => {
-            const el = e.target
-            if (!(el instanceof HTMLElement)) {
+            const el = getLink(e.target)
+            if (el === null) {
                 return
             }
             const page = el.dataset.page
@@ -93,4 +93,18 @@ export function WikiPage({ page, onNavigate }: WikiPageProps) {
             <div dangerouslySetInnerHTML={{ __html: html }} onClick={click} />
         </div>
     )
+}
+
+function getLink(el: EventTarget): HTMLAnchorElement | null {
+    if (!(el instanceof HTMLElement)) {
+        return null
+    }
+    let current: HTMLElement | null = el
+    while (current !== null) {
+        if (current instanceof HTMLAnchorElement) {
+            return current
+        }
+        current = current.parentElement
+    }
+    return null
 }
