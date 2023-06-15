@@ -56,6 +56,9 @@ export function Game() {
             const pages = game.pages
             let i = 0
             for (const page of pages) {
+                if (i > game.index) {
+                    break
+                }
                 if (page === newPage) {
                     location.hash = String(i)
                     return
